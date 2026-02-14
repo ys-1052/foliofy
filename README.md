@@ -4,8 +4,8 @@
 
 ## Tech Stack
 
-- **Backend**: FastAPI + Python 3.11 + PostgreSQL
-- **Frontend**: Next.js 14 + React + TypeScript
+- **Backend**: FastAPI + Python 3.13 + PostgreSQL
+- **Frontend**: Next.js 15 + React 19 + TypeScript
 - **Infrastructure**: Docker + Docker Compose
 
 ## Getting Started
