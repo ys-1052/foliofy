@@ -1,11 +1,13 @@
-.PHONY: help install format lint check test migrate migrate-auto upgrade downgrade run clean
+.PHONY: help install format format-check lint typecheck check test migrate migrate-auto upgrade downgrade run clean
 
 # デフォルトターゲット: ヘルプを表示
 help:
 	@echo "Available commands:"
 	@echo "  make install        - Install all dependencies"
 	@echo "  make format         - Format code with black and ruff"
+	@echo "  make format-check   - Check code formatting (CI)"
 	@echo "  make lint           - Run linter (ruff)"
+	@echo "  make typecheck      - Run type checker (mypy)"
 	@echo "  make check          - Run all checks (lint + type check)"
 	@echo "  make test           - Run tests with pytest"
 	@echo "  make migrate-auto   - Generate migration automatically"
@@ -26,6 +28,14 @@ format:
 	@echo "🎨 Sorting imports with ruff..."
 	ruff check --select I --fix app/ alembic/
 	@echo "✅ Formatting complete!"
+
+# コードフォーマットチェック（CI用）
+format-check:
+	@echo "🎨 Checking code formatting with black..."
+	black --check app/ alembic/
+	@echo "🎨 Checking import sorting with ruff..."
+	ruff check --select I app/ alembic/
+	@echo "✅ Format check complete!"
 
 # リンター実行
 lint:
