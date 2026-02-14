@@ -1,11 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(
-    title="Foliofy API",
-    description="保有株管理ツール API",
-    version="0.1.0"
-)
+app = FastAPI(title="Foliofy API", description="保有株管理ツール API", version="0.1.0")
 
 # CORS設定
 app.add_middleware(
@@ -16,9 +12,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 def read_root():
     return {"message": "Welcome to Foliofy API"}
+
 
 @app.get("/health")
 def health_check():

@@ -1,15 +1,18 @@
-from pydantic import BaseModel, EmailStr
-from typing import Optional
 from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
+
+from pydantic import BaseModel, EmailStr
+
 
 # User schemas
 class UserBase(BaseModel):
     email: EmailStr
 
+
 class UserCreate(UserBase):
     pass
+
 
 class User(UserBase):
     id: UUID
@@ -19,18 +22,22 @@ class User(UserBase):
     class Config:
         from_attributes = True
 
+
 # Holding schemas
 class HoldingBase(BaseModel):
     symbol: str
     shares: Decimal
     avg_cost: Decimal
 
+
 class HoldingCreate(HoldingBase):
     pass
 
+
 class HoldingUpdate(BaseModel):
-    shares: Optional[Decimal] = None
-    avg_cost: Optional[Decimal] = None
+    shares: Decimal | None = None
+    avg_cost: Decimal | None = None
+
 
 class Holding(HoldingBase):
     id: UUID
@@ -41,6 +48,7 @@ class Holding(HoldingBase):
 
     class Config:
         from_attributes = True
+
 
 # Dashboard schemas
 class DashboardHolding(BaseModel):
@@ -54,6 +62,7 @@ class DashboardHolding(BaseModel):
     pnl: Decimal
     pnl_pct: Decimal
     allocation_pct: Decimal
+
 
 class Dashboard(BaseModel):
     total_value: Decimal
