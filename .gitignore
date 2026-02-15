@@ -72,6 +72,12 @@ coverage/
 # Playwright MCP
 .playwright-mcp/
 
+# AWS CDK
+aws/cdk.out/
+aws/**/*.js
+aws/**/*.d.ts
+!aws/jest.config.js
+
 # Temporary files
 *.tmp
 *.temp
