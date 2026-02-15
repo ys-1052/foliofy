@@ -1,5 +1,12 @@
 .PHONY: help install format format-check lint typecheck check test migrate migrate-auto upgrade downgrade run clean
 
+# Detect CI environment
+ifdef CI
+	EXEC_PREFIX :=
+else
+	EXEC_PREFIX := docker-compose exec backend
+endif
+
 # デフォルトターゲット: ヘルプを表示
 help:
 	@echo "Available commands:"
@@ -18,35 +25,35 @@ help:
 
 # 依存関係インストール
 install:
-	docker-compose exec backend pip install -r requirements.txt
-	docker-compose exec backend pip install -r requirements-dev.txt
+	$(EXEC_PREFIX) pip install -r requirements.txt
+	$(EXEC_PREFIX) pip install -r requirements-dev.txt
 
 # コードフォーマット
 format:
 	@echo "🎨 Formatting code with black..."
-	docker-compose exec backend black app/ alembic/
+	$(EXEC_PREFIX) black app/ alembic/
 	@echo "🎨 Sorting imports with ruff..."
-	docker-compose exec backend ruff check --select I --fix app/ alembic/
+	$(EXEC_PREFIX) ruff check --select I --fix app/ alembic/
 	@echo "✅ Formatting complete!"
 
 # コードフォーマットチェック（CI用）
 format-check:
 	@echo "🎨 Checking code formatting with black..."
-	docker-compose exec backend black --check app/ alembic/
+	$(EXEC_PREFIX) black --check app/ alembic/
 	@echo "🎨 Checking import sorting with ruff..."
-	docker-compose exec backend ruff check --select I app/ alembic/
+	$(EXEC_PREFIX) ruff check --select I app/ alembic/
 	@echo "✅ Format check complete!"
 
 # リンター実行
 lint:
 	@echo "🔍 Running ruff linter..."
-	docker-compose exec backend ruff check app/ alembic/
+	$(EXEC_PREFIX) ruff check app/ alembic/
 	@echo "✅ Linting complete!"
 
 # 型チェック
 typecheck:
 	@echo "🔍 Running mypy type checker..."
-	docker-compose exec backend mypy app/ --ignore-missing-imports
+	$(EXEC_PREFIX) mypy app/ --ignore-missing-imports
 	@echo "✅ Type check complete!"
 
 # 全チェック実行
@@ -56,29 +63,33 @@ check: lint typecheck
 # テスト実行
 test:
 	@echo "🧪 Running tests..."
-	docker-compose exec backend pytest tests/ -v
+	$(EXEC_PREFIX) pytest tests/ -v
 	@echo "✅ Tests complete!"
 
 # マイグレーション自動生成
 migrate-auto:
 	@read -p "Enter migration message: " msg; \
-	docker-compose exec backend alembic revision --autogenerate -m "$$msg"
+	$(EXEC_PREFIX) alembic revision --autogenerate -m "$$msg"
 
 # マイグレーション適用
 upgrade:
 	@echo "⬆️  Applying migrations..."
-	docker-compose exec backend alembic upgrade head
+	$(EXEC_PREFIX) alembic upgrade head
 	@echo "✅ Migrations applied!"
 
 # マイグレーションロールバック
 downgrade:
 	@echo "⬇️  Rolling back migration..."
-	docker-compose exec backend alembic downgrade -1
+	$(EXEC_PREFIX) alembic downgrade -1
 	@echo "✅ Migration rolled back!"
 
 # 開発サーバー起動
 run:
+ifdef CI
+	uvicorn app.main:app --host 0.0.0.0 --port 8000
+else
 	docker-compose up backend
+endif
 
 # キャッシュクリーンアップ
 clean:
