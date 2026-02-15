@@ -3,8 +3,6 @@
 from decimal import Decimal
 from unittest.mock import patch
 
-import pytest
-
 
 def test_list_holdings_empty(client, test_user):
     """Test getting empty holdings list."""

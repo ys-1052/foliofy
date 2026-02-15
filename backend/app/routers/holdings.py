@@ -8,31 +8,36 @@ from sqlalchemy.orm import Session
 
 from app import models, schemas
 from app.database import get_db
+from app.dependencies.auth import get_current_user
 from app.services.stock_service import StockNotFoundError, get_stock_price
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/holdings", tags=["holdings"])
 
-# TODO: Replace with actual authentication
-# For MVP, using hardcoded user ID
-HARDCODED_USER_ID = UUID("a12336b9-edcc-43fc-b564-ca1fe6897ebc")
-
 
 @router.get("", response_model=list[schemas.Holding])
-def list_holdings(db: Session = Depends(get_db)):
+def list_holdings(
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     """
     Get all holdings for the current user.
 
     Returns:
         List of holdings with details
     """
-    holdings = db.query(models.Holding).filter(models.Holding.user_id == HARDCODED_USER_ID).all()
+    user_id = UUID(current_user["sub"])
+    holdings = db.query(models.Holding).filter(models.Holding.user_id == user_id).all()
     return holdings
 
 
 @router.post("", response_model=schemas.Holding, status_code=status.HTTP_201_CREATED)
-def create_or_update_holding(holding_data: schemas.HoldingCreate, db: Session = Depends(get_db)):
+def create_or_update_holding(
+    holding_data: schemas.HoldingCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     """
     Create a new holding or update existing one with weighted average.
 
@@ -50,6 +55,8 @@ def create_or_update_holding(holding_data: schemas.HoldingCreate, db: Session = 
         HTTPException 400: If stock symbol is invalid
         HTTPException 500: If stock API fails
     """
+    user_id = UUID(current_user["sub"])
+
     # Fetch stock name from yfinance
     try:
         stock_data = get_stock_price(holding_data.symbol.upper())
@@ -70,7 +77,7 @@ def create_or_update_holding(holding_data: schemas.HoldingCreate, db: Session = 
     existing_holding = (
         db.query(models.Holding)
         .filter(
-            models.Holding.user_id == HARDCODED_USER_ID,
+            models.Holding.user_id == user_id,
             models.Holding.symbol == holding_data.symbol.upper(),
         )
         .first()
@@ -107,7 +114,7 @@ def create_or_update_holding(holding_data: schemas.HoldingCreate, db: Session = 
     else:
         # Create new holding
         new_holding = models.Holding(
-            user_id=HARDCODED_USER_ID,
+            user_id=user_id,
             symbol=holding_data.symbol.upper(),
             name=stock_name,
             shares=holding_data.shares,
@@ -125,7 +132,10 @@ def create_or_update_holding(holding_data: schemas.HoldingCreate, db: Session = 
 
 @router.put("/{holding_id}", response_model=schemas.Holding)
 def update_holding(
-    holding_id: UUID, holding_update: schemas.HoldingUpdate, db: Session = Depends(get_db)
+    holding_id: UUID,
+    holding_update: schemas.HoldingUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """
     Update a holding's shares or average cost.
@@ -140,11 +150,12 @@ def update_holding(
     Raises:
         HTTPException 404: If holding not found
     """
+    user_id = UUID(current_user["sub"])
     holding = (
         db.query(models.Holding)
         .filter(
             models.Holding.id == holding_id,
-            models.Holding.user_id == HARDCODED_USER_ID,
+            models.Holding.user_id == user_id,
         )
         .first()
     )
@@ -173,7 +184,11 @@ def update_holding(
 
 
 @router.delete("/{holding_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_holding(holding_id: UUID, db: Session = Depends(get_db)):
+def delete_holding(
+    holding_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     """
     Delete a holding.
 
@@ -183,11 +198,12 @@ def delete_holding(holding_id: UUID, db: Session = Depends(get_db)):
     Raises:
         HTTPException 404: If holding not found
     """
+    user_id = UUID(current_user["sub"])
     holding = (
         db.query(models.Holding)
         .filter(
             models.Holding.id == holding_id,
-            models.Holding.user_id == HARDCODED_USER_ID,
+            models.Holding.user_id == user_id,
         )
         .first()
     )

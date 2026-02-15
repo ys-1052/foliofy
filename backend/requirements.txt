@@ -8,3 +8,6 @@ email-validator==2.2.0
 alembic==1.14.0
 yfinance==1.1.0
 python-dotenv==1.0.1
+boto3==1.35.94
+python-jose[cryptography]==3.3.0
+requests==2.32.3

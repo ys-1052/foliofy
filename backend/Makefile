@@ -18,35 +18,35 @@ help:
 
 # 依存関係インストール
 install:
-	pip install -r requirements.txt
-	pip install -r requirements-dev.txt
+	docker-compose exec backend pip install -r requirements.txt
+	docker-compose exec backend pip install -r requirements-dev.txt
 
 # コードフォーマット
 format:
 	@echo "🎨 Formatting code with black..."
-	black app/ alembic/
+	docker-compose exec backend black app/ alembic/
 	@echo "🎨 Sorting imports with ruff..."
-	ruff check --select I --fix app/ alembic/
+	docker-compose exec backend ruff check --select I --fix app/ alembic/
 	@echo "✅ Formatting complete!"
 
 # コードフォーマットチェック（CI用）
 format-check:
 	@echo "🎨 Checking code formatting with black..."
-	black --check app/ alembic/
+	docker-compose exec backend black --check app/ alembic/
 	@echo "🎨 Checking import sorting with ruff..."
-	ruff check --select I app/ alembic/
+	docker-compose exec backend ruff check --select I app/ alembic/
 	@echo "✅ Format check complete!"
 
 # リンター実行
 lint:
 	@echo "🔍 Running ruff linter..."
-	ruff check app/ alembic/
+	docker-compose exec backend ruff check app/ alembic/
 	@echo "✅ Linting complete!"
 
 # 型チェック
 typecheck:
 	@echo "🔍 Running mypy type checker..."
-	mypy app/
+	docker-compose exec backend mypy app/ --ignore-missing-imports
 	@echo "✅ Type check complete!"
 
 # 全チェック実行
@@ -56,29 +56,29 @@ check: lint typecheck
 # テスト実行
 test:
 	@echo "🧪 Running tests..."
-	pytest tests/ -v
+	docker-compose exec backend pytest tests/ -v
 	@echo "✅ Tests complete!"
 
 # マイグレーション自動生成
 migrate-auto:
 	@read -p "Enter migration message: " msg; \
-	alembic revision --autogenerate -m "$$msg"
+	docker-compose exec backend alembic revision --autogenerate -m "$$msg"
 
 # マイグレーション適用
 upgrade:
 	@echo "⬆️  Applying migrations..."
-	alembic upgrade head
+	docker-compose exec backend alembic upgrade head
 	@echo "✅ Migrations applied!"
 
 # マイグレーションロールバック
 downgrade:
 	@echo "⬇️  Rolling back migration..."
-	alembic downgrade -1
+	docker-compose exec backend alembic downgrade -1
 	@echo "✅ Migration rolled back!"
 
 # 開発サーバー起動
 run:
-	uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+	docker-compose up backend
 
 # キャッシュクリーンアップ
 clean:

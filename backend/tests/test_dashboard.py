@@ -13,6 +13,7 @@ def test_dashboard_no_holdings(client, test_user):
 
 def test_dashboard_with_holdings(client, test_user):
     """Test dashboard with holdings."""
+
     # Mock stock prices
     def mock_get_multiple_prices(symbols):
         prices = {

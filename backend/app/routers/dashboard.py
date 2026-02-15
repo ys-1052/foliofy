@@ -3,13 +3,14 @@
 import logging
 from datetime import datetime
 from decimal import Decimal
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app import models, schemas
 from app.database import get_db
-from app.routers.holdings import HARDCODED_USER_ID
+from app.dependencies.auth import get_current_user
 from app.services.stock_service import get_multiple_prices
 
 logger = logging.getLogger(__name__)
@@ -18,7 +19,10 @@ router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
 
 @router.get("", response_model=schemas.Dashboard)
-def get_dashboard(db: Session = Depends(get_db)):
+def get_dashboard(
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     """
     Get portfolio dashboard with real-time stock prices and calculations.
 
@@ -33,7 +37,8 @@ def get_dashboard(db: Session = Depends(get_db)):
         HTTPException 404: If no holdings found
     """
     # Fetch all holdings for user
-    holdings = db.query(models.Holding).filter(models.Holding.user_id == HARDCODED_USER_ID).all()
+    user_id = UUID(current_user["sub"])
+    holdings = db.query(models.Holding).filter(models.Holding.user_id == user_id).all()
 
     if not holdings:
         raise HTTPException(
