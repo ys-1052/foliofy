@@ -26,8 +26,8 @@ function DashboardContent() {
     if (error.includes("No holdings") || error.includes("not found")) {
       return (
         <div className="py-20 text-center">
-          <h2 className="text-lg font-medium text-gray-900">No holdings yet</h2>
-          <p className="mt-2 text-sm text-gray-500">
+          <h2 className="text-lg font-medium text-white">No holdings yet</h2>
+          <p className="mt-2 text-sm text-gray-400">
             Add your first holding to see your dashboard.
           </p>
           <Link

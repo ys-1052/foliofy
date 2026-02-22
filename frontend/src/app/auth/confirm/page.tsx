@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthAPI } from "@/lib/auth";
@@ -25,7 +25,6 @@ function ConfirmContent() {
 
     try {
       await AuthAPI.confirmSignUp({ email, confirmation_code: code });
-      // Auto-signin after confirmation
       const password = sessionStorage.getItem("signup_password");
       if (password) {
         sessionStorage.removeItem("signup_password");
@@ -60,93 +59,87 @@ function ConfirmContent() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="w-full max-w-md">
-          <div className="bg-blue-900 rounded-lg shadow-xl p-8">
-            <div className="text-center">
-              <div className="text-green-400 text-6xl mb-4">✓</div>
-              <h2 className="text-2xl font-bold text-white mb-4">Email Confirmed</h2>
-              <p className="text-gray-300 mb-4">Your email has been verified</p>
-              <p className="text-sm text-gray-400">Redirecting to sign in page...</p>
-            </div>
-          </div>
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="text-center">
+          <div className="text-green-400 text-5xl mb-4">✓</div>
+          <h2 className="text-2xl font-bold mb-2">Email Confirmed</h2>
+          <p className="text-gray-400">Redirecting to sign in...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md">
-        <div className="bg-blue-900 rounded-lg shadow-xl p-8">
-          <h1 className="text-3xl font-bold text-white text-center mb-8">Foliofy</h1>
-          <h2 className="text-xl text-white text-center mb-6">Email Confirmation</h2>
-
-          <p className="text-gray-300 text-sm mb-6 text-center">
-            Enter the confirmation code sent to your email address
-          </p>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="your@email.com"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="code" className="block text-sm font-medium text-white mb-2">
-                Confirmation Code
-              </label>
-              <input
-                id="code"
-                type="text"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="123456"
-              />
-            </div>
-
-            {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? "Confirming..." : "Confirm"}
-            </button>
-
-            <button
-              type="button"
-              onClick={handleResend}
-              disabled={isResending}
-              className="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isResending ? "Resending..." : "Resend Code"}
-            </button>
-          </form>
-
-          <p className="mt-4 text-center text-sm text-gray-300">
-            <Link href="/auth/signin" className="text-blue-300 hover:text-blue-200 underline">
-              Back to Sign In
-            </Link>
-          </p>
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="w-full max-w-sm">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold tracking-tight">Foliofy</h1>
+          <p className="mt-1 text-gray-400">Verify your email address</p>
         </div>
+
+        <p className="text-sm text-gray-400 mb-6">Enter the 6-digit code sent to your email.</p>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1.5">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              placeholder="you@example.com"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="code" className="block text-sm font-medium text-gray-300 mb-1.5">
+              Confirmation Code
+            </label>
+            <input
+              id="code"
+              type="text"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              required
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent tracking-widest text-center text-lg transition"
+              placeholder="000000"
+              maxLength={6}
+            />
+          </div>
+
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? "Verifying..." : "Verify"}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={isResending}
+            className="w-full text-sm text-gray-400 hover:text-white py-2 transition disabled:opacity-50"
+          >
+            {isResending ? "Resending..." : "Resend code"}
+          </button>
+        </form>
+
+        <p className="mt-4 text-center text-sm text-gray-500">
+          <Link href="/auth/signin" className="text-gray-400 hover:text-white">
+            Back to Sign In
+          </Link>
+        </p>
       </div>
     </div>
   );
@@ -156,8 +149,8 @@ export default function ConfirmPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-blue-900">Loading...</div>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-gray-400">Loading...</div>
         </div>
       }
     >

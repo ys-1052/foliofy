@@ -1,6 +1,6 @@
 "use client";
 
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import type { DashboardHolding } from "@/lib/types";
 import { formatUSD } from "@/lib/format";
 
@@ -35,10 +35,10 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Toolti
   if (!active || !payload?.length) return null;
   const item = payload[0].payload;
   return (
-    <div className="rounded border border-gray-200 bg-white px-3 py-2 text-sm shadow">
-      <p className="font-medium">{item.symbol}</p>
-      <p className="text-gray-600">{formatUSD(item.marketValue)}</p>
-      <p className="text-gray-500">{item.pct.toFixed(1)}%</p>
+    <div className="rounded bg-gray-800 px-3 py-2 text-sm shadow border border-gray-600">
+      <p className="font-medium text-white">{item.symbol}</p>
+      <p className="text-gray-300">{formatUSD(item.marketValue)}</p>
+      <p className="text-gray-400">{item.pct.toFixed(1)}%</p>
     </div>
   );
 }
@@ -52,8 +52,7 @@ export default function AllocationChart({ holdings }: Props) {
   }));
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4">
-      <h2 className="mb-3 text-sm font-medium text-gray-700">Allocation</h2>
+    <div>
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
           <Pie
@@ -62,10 +61,8 @@ export default function AllocationChart({ holdings }: Props) {
             nameKey="symbol"
             cx="50%"
             cy="50%"
+            innerRadius={60}
             outerRadius={100}
-            label={({ name, value }: { name?: string; value?: number }) =>
-              `${name} ${value?.toFixed(1)}%`
-            }
             labelLine={false}
           >
             {data.map((_, index) => (
@@ -73,9 +70,21 @@ export default function AllocationChart({ holdings }: Props) {
             ))}
           </Pie>
           <Tooltip content={<CustomTooltip />} />
-          <Legend />
         </PieChart>
       </ResponsiveContainer>
+      <div className="mt-4 space-y-2">
+        {data.map((item, index) => (
+          <div key={item.symbol} className="flex items-center gap-2 text-sm">
+            <span
+              className="w-3 h-3 rounded-full shrink-0"
+              style={{ backgroundColor: COLORS[index % COLORS.length] }}
+            />
+            <span className="text-gray-300">
+              {item.symbol} ({item.pct.toFixed(0)}%)
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

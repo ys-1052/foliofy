@@ -61,26 +61,26 @@ export default function HoldingForm({ onSubmit, initialData, onCancel }: Props) 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-lg border border-gray-200 bg-white p-4">
-      <h3 className="text-sm font-medium text-gray-700 mb-3">
+    <form onSubmit={handleSubmit} className="rounded-lg border border-gray-700 bg-gray-800/50 p-4">
+      <h3 className="text-sm font-medium text-gray-300 mb-3">
         {isEdit ? `Edit ${initialData.symbol}` : "Add Holding"}
       </h3>
       <div className="flex flex-wrap gap-3 items-end">
         {!isEdit && (
           <div className="flex-1 min-w-[120px]">
-            <label className="block text-xs text-gray-500 mb-1">Symbol</label>
+            <label className="block text-xs text-gray-400 mb-1">Symbol</label>
             <input
               type="text"
               value={symbol}
               onChange={(e) => setSymbol(e.target.value)}
               placeholder="AAPL"
-              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full rounded border border-gray-600 bg-gray-700 text-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none placeholder-gray-500"
               maxLength={5}
             />
           </div>
         )}
         <div className="flex-1 min-w-[120px]">
-          <label className="block text-xs text-gray-500 mb-1">Shares</label>
+          <label className="block text-xs text-gray-400 mb-1">Shares</label>
           <input
             type="number"
             value={shares}
@@ -88,11 +88,11 @@ export default function HoldingForm({ onSubmit, initialData, onCancel }: Props) 
             placeholder="10"
             step="0.01"
             min="0.01"
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            className="w-full rounded border border-gray-600 bg-gray-700 text-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none placeholder-gray-500"
           />
         </div>
         <div className="flex-1 min-w-[120px]">
-          <label className="block text-xs text-gray-500 mb-1">Avg Cost ($)</label>
+          <label className="block text-xs text-gray-400 mb-1">Avg Cost ($)</label>
           <input
             type="number"
             value={avgCost}
@@ -100,7 +100,7 @@ export default function HoldingForm({ onSubmit, initialData, onCancel }: Props) 
             placeholder="150.00"
             step="0.01"
             min="0.01"
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            className="w-full rounded border border-gray-600 bg-gray-700 text-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none placeholder-gray-500"
           />
         </div>
         <div className="flex gap-2">
@@ -115,14 +115,14 @@ export default function HoldingForm({ onSubmit, initialData, onCancel }: Props) 
             <button
               type="button"
               onClick={onCancel}
-              className="rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="rounded border border-gray-600 px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700"
             >
               Cancel
             </button>
           )}
         </div>
       </div>
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
     </form>
   );
 }

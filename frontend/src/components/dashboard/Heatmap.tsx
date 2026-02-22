@@ -55,7 +55,7 @@ function CustomContent({
         width={width}
         height={height}
         fill={getHeatmapColor(dailyChangePct)}
-        stroke="#fff"
+        stroke="#0a0e2a"
         strokeWidth={2}
         rx={4}
       />
@@ -111,9 +111,8 @@ export default function Heatmap({ holdings }: Props) {
   }));
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4">
-      <h2 className="mb-3 text-sm font-medium text-gray-700">Heatmap</h2>
-      <ResponsiveContainer width="100%" height={300}>
+    <div>
+      <ResponsiveContainer width="100%" height={400}>
         <Treemap
           data={data}
           dataKey="size"

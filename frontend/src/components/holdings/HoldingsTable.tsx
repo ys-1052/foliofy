@@ -12,7 +12,7 @@ interface Props {
 export default function HoldingsTable({ holdings, onEdit, onDelete }: Props) {
   if (holdings.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
+      <div className="py-8 text-center text-sm text-gray-400">
         No holdings yet. Add your first holding above.
       </div>
     );
@@ -25,40 +25,60 @@ export default function HoldingsTable({ holdings, onEdit, onDelete }: Props) {
   };
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+    <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs font-medium uppercase text-gray-500">
+          <tr className="border-b border-gray-700 text-left text-xs font-medium uppercase text-gray-400">
             <th className="px-4 py-3">Symbol</th>
-            <th className="px-4 py-3">Name</th>
             <th className="px-4 py-3 text-right">Shares</th>
-            <th className="px-4 py-3 text-right">Avg Cost</th>
-            <th className="px-4 py-3 text-right">Total Cost</th>
-            <th className="px-4 py-3 text-right">Actions</th>
+            <th className="px-4 py-3 text-right">Avg.</th>
+            <th className="px-4 py-3 text-right"></th>
           </tr>
         </thead>
         <tbody>
           {holdings.map((holding) => (
-            <tr key={holding.id} className="border-b border-gray-100 last:border-0">
-              <td className="px-4 py-3 font-medium">{holding.symbol}</td>
-              <td className="px-4 py-3 text-gray-600">{holding.name}</td>
-              <td className="px-4 py-3 text-right">{formatShares(holding.shares)}</td>
-              <td className="px-4 py-3 text-right">{formatUSD(holding.avg_cost)}</td>
-              <td className="px-4 py-3 text-right">
-                {formatUSD(holding.shares * holding.avg_cost)}
-              </td>
+            <tr key={holding.id} className="border-b border-gray-700/50">
+              <td className="px-4 py-3 font-medium text-white">{holding.symbol}</td>
+              <td className="px-4 py-3 text-right text-gray-300">{formatShares(holding.shares)}</td>
+              <td className="px-4 py-3 text-right text-gray-300">{formatUSD(holding.avg_cost)}</td>
               <td className="px-4 py-3 text-right">
                 <button
                   onClick={() => onEdit(holding)}
-                  className="mr-2 text-blue-600 hover:text-blue-800"
+                  className="mr-3 text-gray-400 hover:text-white transition-colors"
+                  title="Edit"
                 >
-                  Edit
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                  </svg>
                 </button>
                 <button
                   onClick={() => handleDelete(holding.id, holding.symbol)}
-                  className="text-red-600 hover:text-red-800"
+                  className="text-gray-400 hover:text-red-400 transition-colors"
+                  title="Delete"
                 >
-                  Delete
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  </svg>
                 </button>
               </td>
             </tr>
