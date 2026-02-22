@@ -1,6 +1,6 @@
 ---
 name: postgres-patterns
-description: PostgreSQL database patterns for query optimization, schema design, indexing, and security. Based on Supabase best practices.
+description: PostgreSQL database patterns for query optimization, schema design, indexing, and security.
 ---
 
 # PostgreSQL Patterns
@@ -12,7 +12,6 @@ Quick reference for PostgreSQL best practices. For detailed guidance, use the `d
 - Writing SQL queries or migrations
 - Designing database schemas
 - Troubleshooting slow queries
-- Implementing Row Level Security
 - Setting up connection pooling
 
 ## Quick Reference
@@ -57,12 +56,6 @@ CREATE INDEX idx ON users (email) INCLUDE (name, created_at);
 ```sql
 CREATE INDEX idx ON users (email) WHERE deleted_at IS NULL;
 -- Smaller index, only includes active users
-```
-
-**RLS Policy (Optimized):**
-```sql
-CREATE POLICY policy ON orders
-  USING ((SELECT auth.uid()) = user_id);  -- Wrap in SELECT!
 ```
 
 **UPSERT:**
@@ -135,12 +128,3 @@ REVOKE ALL ON SCHEMA public FROM public;
 SELECT pg_reload_conf();
 ```
 
-## Related
-
-- Agent: `database-reviewer` - Full database review workflow
-- Skill: `clickhouse-io` - ClickHouse analytics patterns
-- Skill: `backend-patterns` - API and backend patterns
-
----
-
-*Based on [Supabase Agent Skills](https://github.com/supabase/agent-skills) (MIT License)*

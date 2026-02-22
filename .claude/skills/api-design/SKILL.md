@@ -438,70 +438,35 @@ export async function POST(req: NextRequest) {
 }
 ```
 
-### Python (Django REST Framework)
+### Python (FastAPI)
 
 ```python
-from rest_framework import serializers, viewsets, status
-from rest_framework.response import Response
+from fastapi import APIRouter, HTTPException, status
+from pydantic import BaseModel, EmailStr
 
-class CreateUserSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    name = serializers.CharField(max_length=100)
+class CreateUserRequest(BaseModel):
+    email: EmailStr
+    name: str
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["id", "email", "name", "created_at"]
+class UserResponse(BaseModel):
+    id: str
+    email: str
+    name: str
+    created_at: datetime
 
-class UserViewSet(viewsets.ModelViewSet):
-    serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
+    model_config = ConfigDict(from_attributes=True)
 
-    def get_serializer_class(self):
-        if self.action == "create":
-            return CreateUserSerializer
-        return UserSerializer
+router = APIRouter(prefix="/api/v1/users", tags=["users"])
 
-    def create(self, request):
-        serializer = CreateUserSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = UserService.create(**serializer.validated_data)
-        return Response(
-            {"data": UserSerializer(user).data},
-            status=status.HTTP_201_CREATED,
-            headers={"Location": f"/api/v1/users/{user.id}"},
-        )
-```
-
-### Go (net/http)
-
-```go
-func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
-    var req CreateUserRequest
-    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-        writeError(w, http.StatusBadRequest, "invalid_json", "Invalid request body")
-        return
+@router.post("/", status_code=status.HTTP_201_CREATED)
+async def create_user(
+    request: CreateUserRequest,
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    user = await UserService.create(db, **request.model_dump())
+    return {
+        "data": UserResponse.model_validate(user).model_dump()
     }
-
-    if err := req.Validate(); err != nil {
-        writeError(w, http.StatusUnprocessableEntity, "validation_error", err.Error())
-        return
-    }
-
-    user, err := h.service.Create(r.Context(), req)
-    if err != nil {
-        switch {
-        case errors.Is(err, domain.ErrEmailTaken):
-            writeError(w, http.StatusConflict, "email_taken", "Email already registered")
-        default:
-            writeError(w, http.StatusInternalServerError, "internal_error", "Internal error")
-        }
-        return
-    }
-
-    w.Header().Set("Location", fmt.Sprintf("/api/v1/users/%s", user.ID))
-    writeJSON(w, http.StatusCreated, map[string]any{"data": user})
-}
 ```
 
 ## API Design Checklist

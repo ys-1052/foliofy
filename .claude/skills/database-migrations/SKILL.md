@@ -1,6 +1,6 @@
 ---
 name: database-migrations
-description: Database migration best practices for schema changes, data migrations, rollbacks, and zero-downtime deployments across PostgreSQL, MySQL, and common ORMs (Prisma, Drizzle, Django, TypeORM, golang-migrate).
+description: Database migration best practices for schema changes, data migrations, rollbacks, and zero-downtime deployments with PostgreSQL and Alembic (SQLAlchemy).
 ---
 
 # Database Migration Patterns
@@ -123,174 +123,75 @@ BEGIN
 END $$;
 ```
 
-## Prisma (TypeScript/Node.js)
-
-### Workflow
-
-```bash
-# Create migration from schema changes
-npx prisma migrate dev --name add_user_avatar
-
-# Apply pending migrations in production
-npx prisma migrate deploy
-
-# Reset database (dev only)
-npx prisma migrate reset
-
-# Generate client after schema changes
-npx prisma generate
-```
-
-### Schema Example
-
-```prisma
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  avatarUrl String?  @map("avatar_url")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  orders    Order[]
-
-  @@map("users")
-  @@index([email])
-}
-```
-
-### Custom SQL Migration
-
-For operations Prisma cannot express (concurrent indexes, data backfills):
-
-```bash
-# Create empty migration, then edit the SQL manually
-npx prisma migrate dev --create-only --name add_email_index
-```
-
-```sql
--- migrations/20240115_add_email_index/migration.sql
--- Prisma cannot generate CONCURRENTLY, so we write it manually
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_users_email ON users (email);
-```
-
-## Drizzle (TypeScript/Node.js)
-
-### Workflow
-
-```bash
-# Generate migration from schema changes
-npx drizzle-kit generate
-
-# Apply migrations
-npx drizzle-kit migrate
-
-# Push schema directly (dev only, no migration file)
-npx drizzle-kit push
-```
-
-### Schema Example
-
-```typescript
-import { pgTable, text, timestamp, uuid, boolean } from "drizzle-orm/pg-core";
-
-export const users = pgTable("users", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  email: text("email").notNull().unique(),
-  name: text("name"),
-  isActive: boolean("is_active").notNull().default(true),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
-```
-
-## Django (Python)
+## Alembic (SQLAlchemy)
 
 ### Workflow
 
 ```bash
 # Generate migration from model changes
-python manage.py makemigrations
+alembic revision --autogenerate -m "add user avatar"
 
-# Apply migrations
-python manage.py migrate
+# Apply all pending migrations
+alembic upgrade head
 
-# Show migration status
-python manage.py showmigrations
+# Rollback last migration
+alembic downgrade -1
 
-# Generate empty migration for custom SQL
-python manage.py makemigrations --empty app_name -n description
+# Show current revision
+alembic current
+
+# Show migration history
+alembic history
+```
+
+### Migration Example
+
+```python
+"""add user avatar
+
+Revision ID: abc123
+Revises: def456
+"""
+from alembic import op
+import sqlalchemy as sa
+
+def upgrade() -> None:
+    op.add_column("users", sa.Column("avatar_url", sa.Text(), nullable=True))
+
+def downgrade() -> None:
+    op.drop_column("users", "avatar_url")
 ```
 
 ### Data Migration
 
 ```python
-from django.db import migrations
+"""backfill display names
 
-def backfill_display_names(apps, schema_editor):
-    User = apps.get_model("accounts", "User")
-    batch_size = 5000
-    users = User.objects.filter(display_name="")
-    while users.exists():
-        batch = list(users[:batch_size])
-        for user in batch:
-            user.display_name = user.username
-        User.objects.bulk_update(batch, ["display_name"], batch_size=batch_size)
+Revision ID: ghi789
+Revises: abc123
+"""
+from alembic import op
+import sqlalchemy as sa
 
-def reverse_backfill(apps, schema_editor):
+def upgrade() -> None:
+    conn = op.get_bind()
+    # Batch update to avoid long locks
+    while True:
+        result = conn.execute(
+            sa.text("""
+                UPDATE users SET display_name = username
+                WHERE id IN (
+                    SELECT id FROM users
+                    WHERE display_name IS NULL
+                    LIMIT 5000
+                )
+            """)
+        )
+        if result.rowcount == 0:
+            break
+
+def downgrade() -> None:
     pass  # Data migration, no reverse needed
-
-class Migration(migrations.Migration):
-    dependencies = [("accounts", "0015_add_display_name")]
-
-    operations = [
-        migrations.RunPython(backfill_display_names, reverse_backfill),
-    ]
-```
-
-### SeparateDatabaseAndState
-
-Remove a column from the Django model without dropping it from the database immediately:
-
-```python
-class Migration(migrations.Migration):
-    operations = [
-        migrations.SeparateDatabaseAndState(
-            state_operations=[
-                migrations.RemoveField(model_name="user", name="legacy_field"),
-            ],
-            database_operations=[],  # Don't touch the DB yet
-        ),
-    ]
-```
-
-## golang-migrate (Go)
-
-### Workflow
-
-```bash
-# Create migration pair
-migrate create -ext sql -dir migrations -seq add_user_avatar
-
-# Apply all pending migrations
-migrate -path migrations -database "$DATABASE_URL" up
-
-# Rollback last migration
-migrate -path migrations -database "$DATABASE_URL" down 1
-
-# Force version (fix dirty state)
-migrate -path migrations -database "$DATABASE_URL" force VERSION
-```
-
-### Migration Files
-
-```sql
--- migrations/000003_add_user_avatar.up.sql
-ALTER TABLE users ADD COLUMN avatar_url TEXT;
-CREATE INDEX CONCURRENTLY idx_users_avatar ON users (avatar_url) WHERE avatar_url IS NOT NULL;
-
--- migrations/000003_add_user_avatar.down.sql
-DROP INDEX IF EXISTS idx_users_avatar;
-ALTER TABLE users DROP COLUMN IF EXISTS avatar_url;
 ```
 
 ## Zero-Downtime Migration Strategy
