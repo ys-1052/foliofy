@@ -3,14 +3,14 @@ import type { Holding, HoldingCreate, HoldingUpdate, Dashboard, DashboardHolding
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const accessToken = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  const accessToken = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
   const headers: HeadersInit = {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   };
 
   if (accessToken) {
-    headers['Authorization'] = `Bearer ${accessToken}`;
+    headers["Authorization"] = `Bearer ${accessToken}`;
   }
 
   const res = await fetch(`${BASE_URL}${path}`, {

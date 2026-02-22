@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useDashboard } from '@/hooks/useDashboard';
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
-import PortfolioSummary from '@/components/dashboard/PortfolioSummary';
-import Heatmap from '@/components/dashboard/Heatmap';
-import AllocationChart from '@/components/dashboard/AllocationChart';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import ErrorMessage from '@/components/ui/ErrorMessage';
+import Link from "next/link";
+import { useDashboard } from "@/hooks/useDashboard";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import PortfolioSummary from "@/components/dashboard/PortfolioSummary";
+import Heatmap from "@/components/dashboard/Heatmap";
+import AllocationChart from "@/components/dashboard/AllocationChart";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import ErrorMessage from "@/components/ui/ErrorMessage";
 
 export default function DashboardPage() {
   return (

@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
-  { href: '/', label: 'Dashboard' },
-  { href: '/holdings', label: 'Holdings' },
+  { href: "/", label: "Dashboard" },
+  { href: "/holdings", label: "Holdings" },
 ];
 
 export default function Header() {
@@ -14,7 +14,7 @@ export default function Header() {
   const { signOut } = useAuth();
 
   const handleSignOut = async () => {
-    if (confirm('Are you sure you want to sign out?')) {
+    if (confirm("Are you sure you want to sign out?")) {
       await signOut();
     }
   };
@@ -32,7 +32,7 @@ export default function Header() {
                 key={item.href}
                 href={item.href}
                 className={`text-sm font-medium transition-colors ${
-                  pathname === item.href ? 'text-blue-600' : 'text-gray-500 hover:text-gray-900'
+                  pathname === item.href ? "text-blue-600" : "text-gray-500 hover:text-gray-900"
                 }`}
               >
                 {item.label}

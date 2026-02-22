@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import { AuthAPI } from '@/lib/auth';
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { AuthAPI } from "@/lib/auth";
 
 function ConfirmContent() {
   const searchParams = useSearchParams();
-  const emailParam = searchParams.get('email');
-  const [email, setEmail] = useState(emailParam || '');
-  const [code, setCode] = useState('');
-  const [error, setError] = useState('');
+  const emailParam = searchParams.get("email");
+  const [email, setEmail] = useState(emailParam || "");
+  const [code, setCode] = useState("");
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
@@ -18,31 +18,31 @@ function ConfirmContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setIsLoading(true);
 
     try {
       await AuthAPI.confirmSignUp({ email, confirmation_code: code });
       setSuccess(true);
       setTimeout(() => {
-        router.push('/auth/signin');
+        router.push("/auth/signin");
       }, 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Confirmation failed');
+      setError(err instanceof Error ? err.message : "Confirmation failed");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleResend = async () => {
-    setError('');
+    setError("");
     setIsResending(true);
 
     try {
       await AuthAPI.resendCode(email);
-      alert('Confirmation code has been resent');
+      alert("Confirmation code has been resent");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to resend code');
+      setError(err instanceof Error ? err.message : "Failed to resend code");
     } finally {
       setIsResending(false);
     }
@@ -118,7 +118,7 @@ function ConfirmContent() {
               disabled={isLoading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Confirming...' : 'Confirm'}
+              {isLoading ? "Confirming..." : "Confirm"}
             </button>
 
             <button
@@ -127,7 +127,7 @@ function ConfirmContent() {
               disabled={isResending}
               className="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isResending ? 'Resending...' : 'Resend Code'}
+              {isResending ? "Resending..." : "Resend Code"}
             </button>
           </form>
 

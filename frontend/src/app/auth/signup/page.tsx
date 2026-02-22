@@ -1,29 +1,29 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { AuthAPI } from '@/lib/auth';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { AuthAPI } from "@/lib/auth";
 
 export default function SignUpPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
 
     if (password.length < 8) {
-      setError('Password must be at least 8 characters');
+      setError("Password must be at least 8 characters");
       return;
     }
 
@@ -34,7 +34,7 @@ export default function SignUpPage() {
       // Redirect to confirmation page with email
       router.push(`/auth/confirm?email=${encodeURIComponent(email)}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sign up failed');
+      setError(err instanceof Error ? err.message : "Sign up failed");
     } finally {
       setIsLoading(false);
     }
@@ -79,7 +79,10 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-white mb-2">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-white mb-2"
+              >
                 Confirm Password
               </label>
               <input
@@ -105,7 +108,7 @@ export default function SignUpPage() {
                 disabled={isLoading}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Signing up...' : 'Sign Up'}
+                {isLoading ? "Signing up..." : "Sign Up"}
               </button>
               <Link
                 href="/auth/signin"
@@ -117,7 +120,7 @@ export default function SignUpPage() {
           </form>
 
           <p className="mt-4 text-center text-sm text-gray-300">
-            Already have an account?{' '}
+            Already have an account?{" "}
             <Link href="/auth/signin" className="text-blue-300 hover:text-blue-200 underline">
               Sign In
             </Link>

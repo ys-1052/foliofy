@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { usePathname } from 'next/navigation';
-import Header from '@/components/layout/Header';
+import { usePathname } from "next/navigation";
+import Header from "@/components/layout/Header";
 
 export default function LayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAuthPage = pathname?.startsWith('/auth');
+  const isAuthPage = pathname?.startsWith("/auth");
 
   if (isAuthPage) {
     return <>{children}</>;

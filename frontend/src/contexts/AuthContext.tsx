@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
-import { AuthAPI, SignInResponse } from '@/lib/auth';
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { AuthAPI, SignInResponse } from "@/lib/auth";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -22,8 +22,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Load tokens from localStorage on mount
   useEffect(() => {
-    const storedAccessToken = localStorage.getItem('access_token');
-    const storedRefreshToken = localStorage.getItem('refresh_token');
+    const storedAccessToken = localStorage.getItem("access_token");
+    const storedRefreshToken = localStorage.getItem("refresh_token");
 
     if (storedAccessToken) {
       setAccessToken(storedAccessToken);
@@ -45,9 +45,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
           const response = await AuthAPI.refreshToken({ refresh_token: refreshToken });
           setAccessToken(response.access_token);
-          localStorage.setItem('access_token', response.access_token);
+          localStorage.setItem("access_token", response.access_token);
         } catch (error) {
-          console.error('Token refresh failed:', error);
+          console.error("Token refresh failed:", error);
           // If refresh fails, sign out
           handleSignOut();
         }
@@ -63,9 +63,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const response = await AuthAPI.signIn({ email, password });
     setAccessToken(response.access_token);
     setRefreshToken(response.refresh_token);
-    localStorage.setItem('access_token', response.access_token);
-    localStorage.setItem('refresh_token', response.refresh_token);
-    localStorage.setItem('id_token', response.id_token);
+    localStorage.setItem("access_token", response.access_token);
+    localStorage.setItem("refresh_token", response.refresh_token);
+    localStorage.setItem("id_token", response.id_token);
   };
 
   const handleSignOut = async () => {
@@ -74,14 +74,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await AuthAPI.signOut(accessToken);
       }
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error("Sign out error:", error);
     } finally {
       setAccessToken(null);
       setRefreshToken(null);
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      localStorage.removeItem('id_token');
-      router.push('/auth/signin');
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      localStorage.removeItem("id_token");
+      router.push("/auth/signin");
     }
   };
 
@@ -103,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

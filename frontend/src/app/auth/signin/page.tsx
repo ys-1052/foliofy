@@ -1,28 +1,28 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SignInPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { signIn } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setIsLoading(true);
 
     try {
       await signIn(email, password);
-      router.push('/');
+      router.push("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sign in failed');
+      setError(err instanceof Error ? err.message : "Sign in failed");
     } finally {
       setIsLoading(false);
     }
@@ -77,7 +77,7 @@ export default function SignInPage() {
                 disabled={isLoading}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Signing in...' : 'Sign In'}
+                {isLoading ? "Signing in..." : "Sign In"}
               </button>
               <Link
                 href="/auth/signup"
@@ -89,7 +89,7 @@ export default function SignInPage() {
           </form>
 
           <p className="mt-4 text-center text-sm text-gray-300">
-            Don&apos;t have an account?{' '}
+            Don&apos;t have an account?{" "}
             <Link href="/auth/signup" className="text-blue-300 hover:text-blue-200 underline">
               Sign Up
             </Link>

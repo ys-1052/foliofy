@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export interface SignUpRequest {
   email: string;
@@ -48,14 +48,14 @@ export interface RefreshTokenResponse {
 export class AuthAPI {
   static async signUp(data: SignUpRequest): Promise<SignUpResponse> {
     const response = await fetch(`${API_URL}/auth/signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.detail || 'Signup failed');
+      throw new Error(error.detail || "Signup failed");
     }
 
     return response.json();
@@ -63,14 +63,14 @@ export class AuthAPI {
 
   static async confirmSignUp(data: ConfirmSignUpRequest): Promise<ConfirmSignUpResponse> {
     const response = await fetch(`${API_URL}/auth/confirm`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.detail || 'Confirmation failed');
+      throw new Error(error.detail || "Confirmation failed");
     }
 
     return response.json();
@@ -78,14 +78,14 @@ export class AuthAPI {
 
   static async resendCode(email: string): Promise<{ message: string }> {
     const response = await fetch(`${API_URL}/auth/resend-code`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.detail || 'Resend failed');
+      throw new Error(error.detail || "Resend failed");
     }
 
     return response.json();
@@ -93,14 +93,14 @@ export class AuthAPI {
 
   static async signIn(data: SignInRequest): Promise<SignInResponse> {
     const response = await fetch(`${API_URL}/auth/signin`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.detail || 'Sign in failed');
+      throw new Error(error.detail || "Sign in failed");
     }
 
     return response.json();
@@ -108,14 +108,14 @@ export class AuthAPI {
 
   static async refreshToken(data: RefreshTokenRequest): Promise<RefreshTokenResponse> {
     const response = await fetch(`${API_URL}/auth/refresh`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.detail || 'Token refresh failed');
+      throw new Error(error.detail || "Token refresh failed");
     }
 
     return response.json();
@@ -123,14 +123,14 @@ export class AuthAPI {
 
   static async signOut(accessToken: string): Promise<void> {
     const response = await fetch(`${API_URL}/auth/signout`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ access_token: accessToken }),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.detail || 'Sign out failed');
+      throw new Error(error.detail || "Sign out failed");
     }
   }
 }
