@@ -56,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ); // 50 minutes
 
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshToken]);
 
   const handleSignIn = async (email: string, password: string) => {
