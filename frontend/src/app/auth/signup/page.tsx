@@ -30,8 +30,9 @@ export default function SignUpPage() {
     setIsLoading(true);
 
     try {
-      const response = await AuthAPI.signUp({ email, password });
-      // Redirect to confirmation page with email
+      await AuthAPI.signUp({ email, password });
+      // Store password temporarily for auto-signin after confirmation
+      sessionStorage.setItem("signup_password", password);
       router.push(`/auth/confirm?email=${encodeURIComponent(email)}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Sign up failed");

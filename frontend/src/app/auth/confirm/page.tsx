@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthAPI } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
 
 function ConfirmContent() {
   const searchParams = useSearchParams();
@@ -15,6 +16,7 @@ function ConfirmContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const router = useRouter();
+  const { signIn } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +25,14 @@ function ConfirmContent() {
 
     try {
       await AuthAPI.confirmSignUp({ email, confirmation_code: code });
+      // Auto-signin after confirmation
+      const password = sessionStorage.getItem("signup_password");
+      if (password) {
+        sessionStorage.removeItem("signup_password");
+        await signIn(email, password);
+        router.push("/");
+        return;
+      }
       setSuccess(true);
       setTimeout(() => {
         router.push("/auth/signin");
