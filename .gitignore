@@ -78,6 +78,9 @@ aws/**/*.js
 aws/**/*.d.ts
 !aws/jest.config.js
 
+# Screenshots
+screenshots/
+
 # Temporary files
 *.tmp
 *.temp
