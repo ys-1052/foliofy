@@ -24,13 +24,13 @@ def test_signup_success(client):
         data = response.json()
         assert data["user_sub"] == "test-sub-123"
         assert data["user_confirmed"] is False
-        assert "検証コード" in data["message"]
+        assert "verification code" in data["message"]
 
 
 def test_signup_duplicate_email(client):
     """Test signup with existing email."""
     with patch("app.services.auth_service.auth_service.sign_up") as mock_signup:
-        mock_signup.side_effect = ValueError("このメールアドレスは既に登録されています")
+        mock_signup.side_effect = ValueError("This email address is already registered")
 
         response = client.post(
             "/auth/signup",
@@ -38,7 +38,7 @@ def test_signup_duplicate_email(client):
         )
 
         assert response.status_code == 400
-        assert "既に登録されています" in response.json()["detail"]
+        assert "already registered" in response.json()["detail"]
 
 
 def test_confirm_signup_success(client):
@@ -56,7 +56,7 @@ def test_confirm_signup_success(client):
         assert response.status_code == 200
         data = response.json()
         assert data["confirmed"] is True
-        assert "確認されました" in data["message"]
+        assert "confirmed" in data["message"].lower()
 
 
 def test_confirm_signup_invalid_code(client):
@@ -64,7 +64,7 @@ def test_confirm_signup_invalid_code(client):
     with patch(
         "app.services.auth_service.auth_service.confirm_sign_up"
     ) as mock_confirm:
-        mock_confirm.side_effect = ValueError("検証コードが正しくありません")
+        mock_confirm.side_effect = ValueError("Invalid verification code")
 
         response = client.post(
             "/auth/confirm",
@@ -72,7 +72,7 @@ def test_confirm_signup_invalid_code(client):
         )
 
         assert response.status_code == 400
-        assert "正しくありません" in response.json()["detail"]
+        assert "Invalid verification code" in response.json()["detail"]
 
 
 def test_resend_code_success(client):
@@ -90,7 +90,7 @@ def test_resend_code_success(client):
         )
 
         assert response.status_code == 200
-        assert "再送信しました" in response.json()["message"]
+        assert "resent" in response.json()["message"].lower()
 
 
 def test_signin_success(client):
@@ -119,7 +119,7 @@ def test_signin_success(client):
 def test_signin_invalid_credentials(client):
     """Test signin with invalid credentials."""
     with patch("app.services.auth_service.auth_service.sign_in") as mock_signin:
-        mock_signin.side_effect = ValueError("メールアドレスまたはパスワードが正しくありません")
+        mock_signin.side_effect = ValueError("Incorrect email or password")
 
         response = client.post(
             "/auth/signin",
@@ -127,13 +127,13 @@ def test_signin_invalid_credentials(client):
         )
 
         assert response.status_code == 401
-        assert "正しくありません" in response.json()["detail"]
+        assert "Incorrect" in response.json()["detail"]
 
 
 def test_signin_user_not_confirmed(client):
     """Test signin with unconfirmed user."""
     with patch("app.services.auth_service.auth_service.sign_in") as mock_signin:
-        mock_signin.side_effect = ValueError("メールアドレスが確認されていません")
+        mock_signin.side_effect = ValueError("Email address not confirmed")
 
         response = client.post(
             "/auth/signin",
@@ -141,7 +141,7 @@ def test_signin_user_not_confirmed(client):
         )
 
         assert response.status_code == 401
-        assert "確認されていません" in response.json()["detail"]
+        assert "not confirmed" in response.json()["detail"]
 
 
 def test_refresh_token_success(client):
@@ -180,4 +180,4 @@ def test_signout_success(client):
         assert response.status_code == 200
         data = response.json()
         assert data["signed_out"] is True
-        assert "サインアウトしました" in data["message"]
+        assert "Signed out" in data["message"]

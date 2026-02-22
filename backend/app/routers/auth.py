@@ -72,16 +72,16 @@ class SignOutResponse(BaseModel):
 # Endpoints
 @router.post("/signup", response_model=SignUpResponse, status_code=status.HTTP_201_CREATED)
 def sign_up(request: SignUpRequest):
-    """ユーザー登録"""
+    """Sign up a new user"""
     try:
         result = auth_service.sign_up(email=request.email, password=request.password)
         return SignUpResponse(
             user_sub=result["user_sub"],
             user_confirmed=result["user_confirmed"],
             message=(
-                "登録が完了しました。メールで送信された検証コードを入力してください。"
+                "Sign up complete. Please enter the verification code sent to your email."
                 if not result["user_confirmed"]
-                else "登録が完了しました。"
+                else "Sign up complete."
             ),
         )
     except ValueError as e:
@@ -92,12 +92,12 @@ def sign_up(request: SignUpRequest):
 
 @router.post("/confirm", response_model=ConfirmSignUpResponse)
 def confirm_sign_up(request: ConfirmSignUpRequest):
-    """メール検証"""
+    """Confirm email verification"""
     try:
         auth_service.confirm_sign_up(
             email=request.email, confirmation_code=request.confirmation_code
         )
-        return ConfirmSignUpResponse(confirmed=True, message="メールアドレスが確認されました。")
+        return ConfirmSignUpResponse(confirmed=True, message="Email address confirmed.")
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     except Exception as e:
@@ -106,17 +106,17 @@ def confirm_sign_up(request: ConfirmSignUpRequest):
 
 @router.post("/resend-code", response_model=ResendCodeResponse)
 def resend_confirmation_code(request: ResendCodeRequest):
-    """検証コード再送信"""
+    """Resend verification code"""
     try:
         auth_service.resend_confirmation_code(email=request.email)
-        return ResendCodeResponse(message="検証コードを再送信しました。")
+        return ResendCodeResponse(message="Verification code resent.")
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)) from e
 
 
 @router.post("/signin", response_model=SignInResponse)
 def sign_in(request: SignInRequest):
-    """サインイン"""
+    """Sign in"""
     try:
         result = auth_service.sign_in(email=request.email, password=request.password)
         return SignInResponse(**result)
@@ -128,7 +128,7 @@ def sign_in(request: SignInRequest):
 
 @router.post("/refresh", response_model=RefreshTokenResponse)
 def refresh_token(request: RefreshTokenRequest):
-    """トークン更新"""
+    """Refresh access token"""
     try:
         result = auth_service.refresh_token(refresh_token=request.refresh_token)
         return RefreshTokenResponse(**result)
@@ -138,9 +138,9 @@ def refresh_token(request: RefreshTokenRequest):
 
 @router.post("/signout", response_model=SignOutResponse)
 def sign_out(request: SignOutRequest):
-    """サインアウト"""
+    """Sign out"""
     try:
         auth_service.sign_out(access_token=request.access_token)
-        return SignOutResponse(signed_out=True, message="サインアウトしました。")
+        return SignOutResponse(signed_out=True, message="Signed out successfully.")
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)) from e

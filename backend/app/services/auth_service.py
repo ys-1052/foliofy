@@ -19,16 +19,16 @@ class AuthService:
 
     def _get_secret_hash(self, username: str) -> str:
         """
-        Cognito Client Secret用のハッシュを生成
-        現在はgenerateSecret=falseなので不要だが、将来用に残す
+        Generate hash for Cognito Client Secret.
+        Currently unused since generateSecret=false, kept for future use.
         """
         message = bytes(username + self.client_id, "utf-8")
-        secret = bytes("", "utf-8")  # Client Secretがない場合
+        secret = bytes("", "utf-8")  # No Client Secret
         dig = hmac.new(secret, msg=message, digestmod=hashlib.sha256).digest()
         return base64.b64encode(dig).decode()
 
     def sign_up(self, email: str, password: str) -> dict:
-        """ユーザー登録"""
+        """Sign up a new user"""
         try:
             response = self.client.sign_up(
                 ClientId=self.client_id,
@@ -46,16 +46,16 @@ class AuthService:
         except ClientError as e:
             error_code = e.response["Error"]["Code"]
             if error_code == "UsernameExistsException":
-                raise ValueError("このメールアドレスは既に登録されています") from e
+                raise ValueError("This email address is already registered") from e
             elif error_code == "InvalidPasswordException":
-                raise ValueError("パスワードが要件を満たしていません") from e
+                raise ValueError("Password does not meet requirements") from e
             elif error_code == "InvalidParameterException":
-                raise ValueError("入力パラメータが無効です") from e
+                raise ValueError("Invalid input parameter") from e
             else:
-                raise Exception(f"登録エラー: {e.response['Error']['Message']}") from e
+                raise Exception(f"Sign up error: {e.response['Error']['Message']}") from e
 
     def confirm_sign_up(self, email: str, confirmation_code: str) -> dict:
-        """メール検証コードで登録確認"""
+        """Confirm sign up with email verification code"""
         try:
             self.client.confirm_sign_up(
                 ClientId=self.client_id,
@@ -66,14 +66,14 @@ class AuthService:
         except ClientError as e:
             error_code = e.response["Error"]["Code"]
             if error_code == "CodeMismatchException":
-                raise ValueError("検証コードが正しくありません") from e
+                raise ValueError("Invalid verification code") from e
             elif error_code == "ExpiredCodeException":
-                raise ValueError("検証コードの有効期限が切れています") from e
+                raise ValueError("Verification code has expired") from e
             else:
-                raise Exception(f"検証エラー: {e.response['Error']['Message']}") from e
+                raise Exception(f"Verification error: {e.response['Error']['Message']}") from e
 
     def resend_confirmation_code(self, email: str) -> dict:
-        """検証コード再送信"""
+        """Resend verification code"""
         try:
             response = self.client.resend_confirmation_code(
                 ClientId=self.client_id,
@@ -81,10 +81,10 @@ class AuthService:
             )
             return {"code_delivery_details": response.get("CodeDeliveryDetails")}
         except ClientError as e:
-            raise Exception(f"再送信エラー: {e.response['Error']['Message']}") from e
+            raise Exception(f"Resend error: {e.response['Error']['Message']}") from e
 
     def sign_in(self, email: str, password: str) -> dict:
-        """サインイン"""
+        """Sign in"""
         try:
             response = self.client.initiate_auth(
                 ClientId=self.client_id,
@@ -105,21 +105,21 @@ class AuthService:
                     "token_type": auth_result["TokenType"],
                 }
             else:
-                raise Exception("認証に失敗しました")
+                raise Exception("Authentication failed")
 
         except ClientError as e:
             error_code = e.response["Error"]["Code"]
             if error_code == "NotAuthorizedException":
-                raise ValueError("メールアドレスまたはパスワードが正しくありません") from e
+                raise ValueError("Incorrect email or password") from e
             elif error_code == "UserNotConfirmedException":
-                raise ValueError("メールアドレスが確認されていません") from e
+                raise ValueError("Email address not confirmed") from e
             elif error_code == "UserNotFoundException":
-                raise ValueError("ユーザーが見つかりません") from e
+                raise ValueError("User not found") from e
             else:
-                raise Exception(f"サインインエラー: {e.response['Error']['Message']}") from e
+                raise Exception(f"Sign in error: {e.response['Error']['Message']}") from e
 
     def refresh_token(self, refresh_token: str) -> dict:
-        """リフレッシュトークンで新しいアクセストークンを取得"""
+        """Get new access token using refresh token"""
         try:
             response = self.client.initiate_auth(
                 ClientId=self.client_id,
@@ -137,10 +137,10 @@ class AuthService:
                 "token_type": auth_result["TokenType"],
             }
         except ClientError as e:
-            raise Exception(f"トークン更新エラー: {e.response['Error']['Message']}") from e
+            raise Exception(f"Token refresh error: {e.response['Error']['Message']}") from e
 
     def _get_jwks(self) -> dict:
-        """Cognito公開鍵（JWKS）を取得"""
+        """Get Cognito public keys (JWKS)"""
         if self._jwks is None:
             keys_url = f"https://cognito-idp.{settings.aws_region}.amazonaws.com/{self.user_pool_id}/.well-known/jwks.json"
             response = requests.get(keys_url)
@@ -149,13 +149,13 @@ class AuthService:
         return self._jwks  # type: ignore[no-any-return]
 
     def verify_token(self, token: str) -> dict:
-        """JWTトークンを検証してペイロードを返す"""
+        """Verify JWT token and return payload"""
         try:
-            # JWTヘッダーからkidを取得
+            # Get kid from JWT header
             headers = jwt.get_unverified_header(token)
             kid = headers["kid"]
 
-            # JWKS から kid に対応する公開鍵を探す
+            # Find public key matching kid from JWKS
             jwks = self._get_jwks()
             key = None
             for jwk in jwks["keys"]:
@@ -164,9 +164,9 @@ class AuthService:
                     break
 
             if not key:
-                raise ValueError("公開鍵が見つかりません")
+                raise ValueError("Public key not found")
 
-            # トークンを検証
+            # Verify token
             payload = jwt.decode(
                 token,
                 key,
@@ -178,16 +178,16 @@ class AuthService:
             return payload  # type: ignore[no-any-return]
 
         except JWTError as e:
-            raise ValueError(f"トークン検証エラー: {str(e)}") from e
+            raise ValueError(f"Token verification error: {str(e)}") from e
 
     def sign_out(self, access_token: str) -> dict:
-        """サインアウト（グローバルサインアウト）"""
+        """Sign out (global sign out)"""
         try:
             self.client.global_sign_out(AccessToken=access_token)
             return {"signed_out": True}
         except ClientError as e:
-            raise Exception(f"サインアウトエラー: {e.response['Error']['Message']}") from e
+            raise Exception(f"Sign out error: {e.response['Error']['Message']}") from e
 
 
-# シングルトンインスタンス
+# Singleton instance
 auth_service = AuthService()

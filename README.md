@@ -1,15 +1,15 @@
-# Foliofy - 保有株管理ツール
+# Foliofy - Stock Portfolio Manager
 
-米国株の保有資産を視覚化・管理するWebアプリケーション
+A web application for visualizing and managing US stock holdings.
 
 ## Features
 
-- 保有株の登録・編集・削除
-- ポートフォリオダッシュボード
-  - 評価額・損益サマリー
-  - ヒートマップ（面積=評価額、色=騰落率）
-  - 資産配分パイチャート
-- リアルタイム株価取得
+- Add, edit, and delete stock holdings
+- Portfolio dashboard
+  - Market value and P&L summary
+  - Heatmap (area = market value, color = daily change)
+  - Asset allocation pie chart
+- Real-time stock price fetching
 
 ## Tech Stack
 
@@ -56,4 +56,3 @@ docker-compose exec frontend npm run check
 # View logs
 docker-compose logs -f
 ```
-
