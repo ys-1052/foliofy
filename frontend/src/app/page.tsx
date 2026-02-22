@@ -1,14 +1,23 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useDashboard } from "@/hooks/useDashboard";
-import PortfolioSummary from "@/components/dashboard/PortfolioSummary";
-import Heatmap from "@/components/dashboard/Heatmap";
-import AllocationChart from "@/components/dashboard/AllocationChart";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import ErrorMessage from "@/components/ui/ErrorMessage";
+import Link from 'next/link';
+import { useDashboard } from '@/hooks/useDashboard';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import PortfolioSummary from '@/components/dashboard/PortfolioSummary';
+import Heatmap from '@/components/dashboard/Heatmap';
+import AllocationChart from '@/components/dashboard/AllocationChart';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ErrorMessage from '@/components/ui/ErrorMessage';
 
 export default function DashboardPage() {
+  return (
+    <ProtectedRoute>
+      <DashboardContent />
+    </ProtectedRoute>
+  );
+}
+
+function DashboardContent() {
   const { data, loading, error, refetch } = useDashboard();
 
   if (loading) return <LoadingSpinner className="py-20" />;

@@ -1,14 +1,23 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useHoldings } from "@/hooks/useHoldings";
-import HoldingForm from "@/components/holdings/HoldingForm";
-import HoldingsTable from "@/components/holdings/HoldingsTable";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import ErrorMessage from "@/components/ui/ErrorMessage";
-import type { Holding, HoldingCreate, HoldingUpdate } from "@/lib/types";
+import { useState } from 'react';
+import { useHoldings } from '@/hooks/useHoldings';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import HoldingForm from '@/components/holdings/HoldingForm';
+import HoldingsTable from '@/components/holdings/HoldingsTable';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ErrorMessage from '@/components/ui/ErrorMessage';
+import type { Holding, HoldingCreate, HoldingUpdate } from '@/lib/types';
 
 export default function HoldingsPage() {
+  return (
+    <ProtectedRoute>
+      <HoldingsContent />
+    </ProtectedRoute>
+  );
+}
+
+function HoldingsContent() {
   const { holdings, loading, error, addHolding, editHolding, removeHolding, refetch } =
     useHoldings();
   const [editingHolding, setEditingHolding] = useState<Holding | null>(null);

@@ -1,15 +1,23 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 const navItems = [
-  { href: "/", label: "Dashboard" },
-  { href: "/holdings", label: "Holdings" },
+  { href: '/', label: 'Dashboard' },
+  { href: '/holdings', label: 'Holdings' },
 ];
 
 export default function Header() {
   const pathname = usePathname();
+  const { signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    if (confirm('Are you sure you want to sign out?')) {
+      await signOut();
+    }
+  };
 
   return (
     <header className="border-b border-gray-200 bg-white">
@@ -18,18 +26,24 @@ export default function Header() {
           <Link href="/" className="text-xl font-bold text-gray-900">
             Foliofy
           </Link>
-          <nav className="flex gap-6">
+          <nav className="flex gap-6 items-center">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={`text-sm font-medium transition-colors ${
-                  pathname === item.href ? "text-blue-600" : "text-gray-500 hover:text-gray-900"
+                  pathname === item.href ? 'text-blue-600' : 'text-gray-500 hover:text-gray-900'
                 }`}
               >
                 {item.label}
               </Link>
             ))}
+            <button
+              onClick={handleSignOut}
+              className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+            >
+              Sign Out
+            </button>
           </nav>
         </div>
       </div>
