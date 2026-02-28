@@ -7,10 +7,7 @@ security = HTTPBearer()
 
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
-    """
-    JWTトークンを検証して、現在のユーザー情報を返す
-    保護されたエンドポイントで使用する依存関数
-    """
+    """Verify JWT token and return current user info."""
     token = credentials.credentials
 
     try:

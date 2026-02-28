@@ -16,6 +16,15 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/holdings", tags=["holdings"])
 
 
+def _ensure_user_exists(db: Session, user_id: UUID, email: str | None = None) -> None:
+    """Create user record if it doesn't exist yet."""
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        user = models.User(id=user_id, email=email or "")
+        db.add(user)
+        db.commit()
+
+
 @router.get("", response_model=list[schemas.Holding])
 def list_holdings(
     db: Session = Depends(get_db),
@@ -28,6 +37,7 @@ def list_holdings(
         List of holdings with details
     """
     user_id = UUID(current_user["sub"])
+    _ensure_user_exists(db, user_id, current_user.get("email"))
     holdings = db.query(models.Holding).filter(models.Holding.user_id == user_id).all()
     return holdings
 
@@ -56,6 +66,7 @@ def create_or_update_holding(
         HTTPException 500: If stock API fails
     """
     user_id = UUID(current_user["sub"])
+    _ensure_user_exists(db, user_id, current_user.get("email"))
 
     # Fetch stock name from yfinance
     try:
