@@ -13,7 +13,7 @@ export default function HoldingsTable({ holdings, onEdit, onDelete }: Props) {
   if (holdings.length === 0) {
     return (
       <div className="py-8 text-center text-sm text-gray-400">
-        No holdings yet. Add your first holding above.
+        No holdings yet. Add your first holding to get started.
       </div>
     );
   }
